@@ -8,6 +8,7 @@ import Observer from "./Observer";
 import Username from "./Username";
 import Room from "./Room";
 import Story from "./Story";
+import {Finish} from "./Finish";
 
 const Separator = () => (
     <View style={styles.separator}/>
@@ -23,12 +24,12 @@ type Props = {
 const Main = (props: Props) => {
     if (!props.ready) {
         return (
-            <View><Text>Loading...</Text></View>
+            <View><Text>Connecting to the server...</Text></View>
         );
     }
 
     let inRoomChildren;
-    if (props.room) {
+    if (props.room !== "") {
         inRoomChildren =
             <>
                 <View style={styles.sideBySide}>
@@ -47,6 +48,7 @@ const Main = (props: Props) => {
         <>
             <View style={styles.sideBySide}>
                 <Room/>
+                {props.room !== "" && <Finish/>}
             </View>
             {inRoomChildren}
         </>
@@ -70,10 +72,10 @@ const styles = StyleSheet.create({
         alignContent: "space-between",
         alignItems: "center",
         justifyContent: "flex-start",
-        width: 400,
+        width: 340,
     },
 });
 
 export default connect((state: RootState) => {
-    return {ready: state.ready, user: state.user, room: state.room, story: state.story}
+    return {ready: state.app.ready, user: state.user, room: state.room, story: state.story}
 })(Main);

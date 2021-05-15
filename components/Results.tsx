@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, StyleSheet, Text, View} from "react-native";
+import {Button, StyleSheet, Text, TouchableWithoutFeedback, View} from "react-native";
 import {connect} from "react-redux";
 import {RootState, Vote} from "../store";
 
@@ -10,15 +10,10 @@ type Props = {
 const Results = ({votes}: Props) => {
     const getVoteDisplay = (vote: Vote, index: number) => {
         return <View style={styles.voter}>
-            <Button
-                key={"vote-value-" + index}
-                title={"" + vote.currentValue}
-                onPress={() => {
-                }}
-            />
+            <Text style={styles.vote}>{vote.currentValue}</Text>
             <Text style={styles.buttonView}>{vote.voterName}</Text>
             {vote.currentValue !== vote.initialValue &&
-            <Text>({"" + vote.initialValue})</Text>
+                <Text>({"" + vote.initialValue})</Text>
             }
         </View>;
     }
@@ -42,20 +37,29 @@ const Results = ({votes}: Props) => {
 
 const styles = StyleSheet.create({
     fixToText: {
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        alignItems: "flex-start",
+        flexDirection: "column",
+        justifyContent: "flex-start",
         alignContent: "center",
-        flexWrap: 'wrap',
-        width: 280,
-        margin: 16,
+        flexWrap: "wrap",
+        width: 340,
+        margin: 8,
+        marginHorizontal: 4,
+    },
+    vote: {
+        padding: 5,
+        backgroundColor: "#eee",
+        textAlign: "center",
+        minWidth: 60,
+        borderRadius: 2,
+        textTransform: "uppercase",
+
     },
     buttonView: {
         margin: 2,
     },
     voter: {
         flexDirection: "row",
-        justifyContent: "space-between",
+        justifyContent: "flex-start",
         alignItems: "center",
         margin: 2,
     }

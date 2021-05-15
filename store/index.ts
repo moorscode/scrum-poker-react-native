@@ -1,34 +1,62 @@
 import {combineReducers, createStore} from 'redux';
 import user, {gotUserId, setUserName, setUserObserver} from './user';
-import votes, {gotMyCurrentVote, gotMyInitialVote, gotVotes, MyVote, Vote, Votes} from './votes';
+import votes, {
+    gotMyCurrentVote,
+    gotMyInitialVote,
+    gotVoteAverage,
+    gotVoteCount,
+    gotVotes,
+    MyVote,
+    Vote,
+    Votes
+} from './votes';
 import points, {gotPoints} from './points';
 import room, {gotRoom} from './room';
-import ready, {setReady} from './general';
+import app, {setBackgroundColor, setReady} from './app';
 import story, {gotStory} from './story';
 import socket from '../utils/Socket';
-import {gotMembers, MemberList} from "./members";
+import members, {gotMembers, MemberList} from "./members";
 
-const reducers = combineReducers({room, votes, user, points, ready, story});
+const reducers = combineReducers({room, votes, user, points, app, story, members});
 const store = createStore(reducers);
+
+const backgroundColor = () => {
+    const state = store.getState();
+    if ( state.votes.voteCount === 0 || state.votes.voteCount < state.members.voters.length || typeof state.votes.voteAverage === "string" ) {
+        return "#eee";
+    }
+
+    // Find the difference between the lowest and the highest votes.
+    const lowestIndex = state.points.indexOf( state.votes.votes[ 0 ].currentValue );
+    const highestIndex = state.points.indexOf( state.votes.votes[ state.votes.votes.length - 1 ].currentValue );
+
+    const pointsSpread = highestIndex - lowestIndex;
+
+    switch ( true ) {
+        case pointsSpread === 0:
+            return "#0f0";
+        case pointsSpread >= 2:
+            return "#f00";
+        default:
+            return "#eee";
+    }
+}
 
 socket.on("userId", (userId: string) => {
     console.log('user id', userId);
     // store.dispatch(gotRoom(''));
     store.dispatch(gotUserId(userId));
+    store.dispatch(setReady(true));
     socket.emit("identify", {id: userId});
 });
 
-let userId = "";
-store.subscribe(() => {
-    const state = store.getState();
-    if (state.user.userId !== userId) {
-        userId = state.user.userId;
-        store.dispatch(setReady(true));
-    }
+socket.on("disconnect", () => {
+    store.dispatch(setReady(false));
 });
 
 socket.on("welcome", () => {
     // changeRoom("test");
+    store.dispatch(setReady(true));
 });
 
 socket.on("story", (story: string) => {
@@ -59,13 +87,15 @@ socket.on("votes", (votesData: Votes) => {
     ) || [];
 
     store.dispatch(gotVotes(votes));
+    store.dispatch(gotVoteAverage(votesData.voteAverage));
+    store.dispatch(gotVoteCount(votesData.voteCount));
     // state.votesRevealed = data.votesRevealed;
-    // state.voteCount = data.voteCount;
     // state.votedNames = data.votedNames || [];
     // setGroupedVoterNames(data.groupedVoterNames || [] );
     // state.nearestPointAverage = data.nearestPointAverage;
-    // state.voteAverage = data.voteAverage;
     // state.votesRevealed = data.votesRevealed;
+
+    store.dispatch(setBackgroundColor( backgroundColor() ) );
 });
 
 socket.on("points", (data: number[] | string[]) => {
@@ -165,7 +195,7 @@ export * from './user';
 export * from './votes';
 export * from './points';
 export * from './room';
-export * from './general';
+export * from './app';
 
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch

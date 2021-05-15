@@ -38,8 +38,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-evenly',
         flexWrap: 'wrap',
-        width: 280,
-        margin: 16,
+        width: 340,
+        marginHorizontal: 4,
     },
     buttonView: {
         margin: 2,
