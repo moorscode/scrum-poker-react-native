@@ -26,8 +26,8 @@ const Story = ({name}: Props) => {
             <View style={styles.container}>
                 <Text style={styles.text}>Story: </Text>
                 <TextInput style={styles.input} onChangeText={setNameInput} value={nameInput}/>
-                <Button onPress={newStory} title="New story"/>
             </View>
+            <Button onPress={newStory} title="New story"/>
         </View>
     );
 }
@@ -38,11 +38,11 @@ const styles = StyleSheet.create({
         alignItems: "center",
         alignContent: "center",
         flexWrap: 'wrap',
-        marginHorizontal: 4,
+        margin: 4,
     },
     input: {
-        padding: 4,
-        margin: 6,
+        paddingHorizontal: 5,
+        marginHorizontal: 2,
         fontSize: 16,
         width: 120,
         borderWidth: 1,
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     sideBySide: {
         flexDirection: "row",
         alignContent: "space-between",
-        justifyContent: "flex-start",
+        justifyContent: "space-between",
         width: 340,
         alignItems: "center",
     }

@@ -1,11 +1,12 @@
 import {combineReducers, createStore} from 'redux';
 import user, {gotUserId, setUserName, setUserObserver} from './user';
 import votes, {
+    gotGroupedVoterNames,
     gotMyCurrentVote,
-    gotMyInitialVote,
+    gotMyInitialVote, gotNearestPointAverage,
     gotVoteAverage,
-    gotVoteCount,
-    gotVotes,
+    gotVoteCount, gotVotedNames,
+    gotVotes, gotVotesRevealed,
     MyVote,
     Vote,
     Votes
@@ -34,17 +35,15 @@ const backgroundColor = () => {
 
     switch ( true ) {
         case pointsSpread === 0:
-            return "#0f0";
+            return "#82a159";
         case pointsSpread >= 2:
-            return "#f00";
+            return "#c94545";
         default:
             return "#eee";
     }
 }
 
 socket.on("userId", (userId: string) => {
-    console.log('user id', userId);
-    // store.dispatch(gotRoom(''));
     store.dispatch(gotUserId(userId));
     store.dispatch(setReady(true));
     socket.emit("identify", {id: userId});
@@ -89,11 +88,10 @@ socket.on("votes", (votesData: Votes) => {
     store.dispatch(gotVotes(votes));
     store.dispatch(gotVoteAverage(votesData.voteAverage));
     store.dispatch(gotVoteCount(votesData.voteCount));
-    // state.votesRevealed = data.votesRevealed;
-    // state.votedNames = data.votedNames || [];
-    // setGroupedVoterNames(data.groupedVoterNames || [] );
-    // state.nearestPointAverage = data.nearestPointAverage;
-    // state.votesRevealed = data.votesRevealed;
+    store.dispatch(gotVotesRevealed(votesData.votesRevealed));
+    store.dispatch(gotVotedNames(votesData.votedNames));
+    store.dispatch(gotGroupedVoterNames(votesData.groupedVoterNames || {}));
+    store.dispatch(gotNearestPointAverage(votesData.nearestPointAverage));
 
     store.dispatch(setBackgroundColor( backgroundColor() ) );
 });
@@ -106,29 +104,23 @@ export const vote = (value: number | string) => {
     const state = store.getState();
 
     if ( state.user.observer ) {
-        console.log('not voting because observer', value);
         return;
     }
-
-    console.log('cast vote', value);
 
     socket.emit("vote", {poker: state.room, vote: value});
 }
 
 export const toggleRevealVotes = () => {
-    console.log('toggle reveal votes');
     const state = store.getState();
     socket.emit("toggleRevealVotes", {poker: state.room});
 }
 
 export const newStory = () => {
-    console.log('new story');
     const state = store.getState();
     socket.emit("newStory", {poker: state.room});
 }
 
 export const finishRefinement = () => {
-    console.log('finish');
     const state = store.getState();
     socket.emit("finish", {poker: state.room});
 }

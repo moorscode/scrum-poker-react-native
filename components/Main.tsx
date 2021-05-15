@@ -9,6 +9,7 @@ import Username from "./Username";
 import Room from "./Room";
 import Story from "./Story";
 import {Finish} from "./Finish";
+import VoteStatus from "./VoteStatus";
 
 const Separator = () => (
     <View style={styles.separator}/>
@@ -58,8 +59,9 @@ const Main = (props: Props) => {
 const styles = StyleSheet.create({
     separator: {
         marginVertical: 8,
-        borderBottomColor: '#737373',
+        borderBottomColor: '#333',
         borderBottomWidth: StyleSheet.hairlineWidth,
+        minHeight: 2,
     },
     container: {
         flex: 1,
@@ -71,7 +73,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignContent: "space-between",
         alignItems: "center",
-        justifyContent: "flex-start",
+        justifyContent: "space-between",
         width: 340,
     },
 });

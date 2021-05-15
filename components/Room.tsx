@@ -9,7 +9,6 @@ type Props = {
 }
 
 const Room = ({name}: Props) => {
-    console.log("room", name);
     const [nameInput, setNameInput] = useState(name);
 
     const debouncedName = useDebounce(nameInput, 750);
@@ -31,11 +30,11 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         alignContent: "flex-start",
-        marginHorizontal: 4,
+        margin: 4,
     },
     input: {
-        padding: 4,
-        margin: 6,
+        paddingHorizontal: 5,
+        marginHorizontal: 2,
         fontSize: 16,
         width: 120,
         borderWidth: 1,
