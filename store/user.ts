@@ -8,11 +8,11 @@ export const setUserObserver = (observer: boolean) => ({type: SET_USER_OBSERVER,
 
 export type User = {
     userId: string | null;
-    name: string | null;
+    name: string;
     observer: boolean;
 }
 
-const reducer = (state: User = {userId: null, name: null, observer: false}, action: any) => {
+const reducer = (state: User = {userId: null, name: "", observer: false}, action: any) => {
     switch (action.type) {
         case GOT_USER_ID:
             return {

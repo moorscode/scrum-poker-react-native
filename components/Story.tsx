@@ -5,7 +5,7 @@ import {changeStoryName, newStory, RootState} from "../store";
 import useDebounce from "../utils/useDebounce";
 
 type Props = {
-    name: string | null;
+    name: string;
 }
 
 const Story = ({name}: Props) => {

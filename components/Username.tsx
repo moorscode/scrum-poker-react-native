@@ -5,7 +5,7 @@ import {changeName, RootState} from "../store";
 import useDebounce from "../utils/useDebounce";
 
 type Props = {
-    name: string | null;
+    name: string;
 }
 
 const Username = ({name}: Props) => {
