@@ -1,38 +1,41 @@
-import React from "react";
-import Main from "./Main";
+import React, {useEffect} from "react";
+import Main from "./components/Main";
 import {Provider} from 'react-redux';
 import store from './store';
+import socket from './utils/Socket';
+import {SafeAreaView, StyleSheet} from "react-native";
 
 function App() {
     // const debouncedRoom = useDebounce( room, 500 );
+    useEffect(() => {
+        return function exit() {
+            const state = store.getState();
+            if ( ! socket.connected ) { return; }
 
-    // useEffect(() => {
-    //     return function exit() {
-    //         if ( ! socket || ! socket.connected ) { return; }
-    //
-    //         if (currentRoom) {
-    //             socket.emit("leave", {poker: room});
-    //         }
-    //
-    //     }
-    // }, [] );
-    //
-    // useEffect( () => {
-    //     if ( currentRoom && userId ) {
-    //         socket.emit("leave", {poker: currentRoom});
-    //     }
-    //
-    //     if ( debouncedRoom && userId ) {
-    //         socket.emit("join", {poker: debouncedRoom, name: "mobile"});
-    //     }
-    // }, [ debouncedRoom ] );
+            if (state.room) {
+                socket.emit("leave", {poker: state.room});
+            }
+
+            socket.disconnect();
+        }
+    }, [] );
 
     return (
         <Provider store={store}>
-            <Main/>
+            <SafeAreaView style={styles.container}>
+                <Main/>
+            </SafeAreaView>
         </Provider>
     );
 }
 
-export default App;
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+});
 
+export default App;

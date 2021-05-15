@@ -2,7 +2,9 @@ const GOT_ROOM = 'GOT_ROOM';
 
 export const gotRoom = (name: string) => ({type: GOT_ROOM, name});
 
-const reducer = (state = 'test', action) => {
+type Room = string;
+
+const reducer = (state: Room = '', action: any) => {
     switch (action.type) {
         case GOT_ROOM:
             return action.name;

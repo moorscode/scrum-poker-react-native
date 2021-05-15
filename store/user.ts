@@ -6,7 +6,13 @@ export const gotUserId = (userId: string) => ({type: GOT_USER_ID, userId});
 export const setUserName = (name: string) => ({type: SET_USER_NAME, name});
 export const setUserObserver = (observer: boolean) => ({type: SET_USER_OBSERVER, observer});
 
-const reducer = (state = {userId: null, name: null, observer: false}, action) => {
+export type User = {
+    userId: string | null;
+    name: string | null;
+    observer: boolean;
+}
+
+const reducer = (state: User = {userId: null, name: null, observer: false}, action: any) => {
     switch (action.type) {
         case GOT_USER_ID:
             return {

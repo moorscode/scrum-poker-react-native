@@ -1,60 +1,64 @@
 import {combineReducers, createStore} from 'redux';
-import user, {gotUserId} from './user';
-import votes, {gotMyCurrentVote, gotMyInitialVote, gotVotes} from './votes';
+import user, {gotUserId, setUserName, setUserObserver} from './user';
+import votes, {gotMyCurrentVote, gotMyInitialVote, gotVotes, MyVote, Vote, Votes} from './votes';
 import points, {gotPoints} from './points';
 import room, {gotRoom} from './room';
 import ready, {setReady} from './general';
 import story, {gotStory} from './story';
-import socket from '../socket';
+import socket from '../utils/Socket';
+import {gotMembers, MemberList} from "./members";
 
 const reducers = combineReducers({room, votes, user, points, ready, story});
 const store = createStore(reducers);
 
-socket.on("userId", data => {
-    console.log('user id', data);
-    store.dispatch(gotUserId(data));
-    store.dispatch(gotRoom(''));
-    socket.emit( "identify", { id: data } );
+socket.on("userId", (userId: string) => {
+    console.log('user id', userId);
+    // store.dispatch(gotRoom(''));
+    store.dispatch(gotUserId(userId));
+    socket.emit("identify", {id: userId});
 });
 
 let userId = "";
 store.subscribe(() => {
     const state = store.getState();
     if (state.user.userId !== userId) {
-        console.log('set ready');
         userId = state.user.userId;
         store.dispatch(setReady(true));
     }
 });
 
 socket.on("welcome", () => {
-    changeRoom("test");
+    // changeRoom("test");
 });
 
-socket.on("story", data => {
-    console.log( "on story", data );
-    store.dispatch(gotStory(data));
+socket.on("story", (story: string) => {
+    store.dispatch(gotStory(story));
 });
 
-socket.on("myVote", data => {
-    store.dispatch(gotMyInitialVote(data.initialVote));
-    store.dispatch(gotMyCurrentVote(data.currentVote));
+socket.on("myVote", (myVote: MyVote) => {
+    store.dispatch(gotMyInitialVote(myVote.initialVote));
+    store.dispatch(gotMyCurrentVote(myVote.currentVote));
 });
 
-socket.on("joined", room => {
+socket.on("joined", (room: string) => {
     store.dispatch(gotRoom(room));
 });
 
-socket.on("votes", data => {
-    if (data.voteCount === 0) {
+socket.on("memberList", (memberList: MemberList) => {
+    store.dispatch(gotMembers(memberList));
+});
+
+socket.on("votes", (votesData: Votes) => {
+    if (votesData.voteCount === 0) {
         store.dispatch(gotMyInitialVote(""));
         store.dispatch(gotMyCurrentVote(""));
     }
 
-    const votes = data.votes.sort((a, b) => a.currentValue - b.currentValue) || [];
+    const votes = votesData.votes.sort(
+        (a: Vote, b: Vote) => parseInt(a.currentValue, 10) - parseInt(b.currentValue, 10)
+    ) || [];
 
     store.dispatch(gotVotes(votes));
-    // setVotesRevealed(data.votesRevealed);
     // state.votesRevealed = data.votesRevealed;
     // state.voteCount = data.voteCount;
     // state.votedNames = data.votedNames || [];
@@ -64,29 +68,95 @@ socket.on("votes", data => {
     // state.votesRevealed = data.votesRevealed;
 });
 
-socket.on("points", data => {
-    console.log('on points', data);
+socket.on("points", (data: number[] | string[]) => {
     store.dispatch(gotPoints(data));
 });
 
-export const vote = value => {
-    console.log('cast vote', value);
-    const state = store.getState();
-    socket.emit( "vote", { poker: state.room, vote: value } );
-}
-
-export const changeRoom = value => {
+export const vote = (value: number | string) => {
     const state = store.getState();
 
-    if ( state.room === value ) {
+    if ( state.user.observer ) {
+        console.log('not voting because observer', value);
         return;
     }
 
-    if ( state.room ) {
-        socket.emit( "leave", { poker: state.room } );
+    console.log('cast vote', value);
+
+    socket.emit("vote", {poker: state.room, vote: value});
+}
+
+export const toggleRevealVotes = () => {
+    console.log('toggle reveal votes');
+    const state = store.getState();
+    socket.emit("toggleRevealVotes", {poker: state.room});
+}
+
+export const newStory = () => {
+    console.log('new story');
+    const state = store.getState();
+    socket.emit("newStory", {poker: state.room});
+}
+
+export const finishRefinement = () => {
+    console.log('finish');
+    const state = store.getState();
+    socket.emit("finish", {poker: state.room});
+}
+
+export const setObserving = (observe: boolean) => {
+    console.log('observing', observe);
+    const state = store.getState();
+
+    if (state.user.observer === observe) {
+        console.log('no change', observe);
+        return;
     }
 
-    socket.emit( "join", { poker: value, name: state.user.name } );
+    store.dispatch(setUserObserver(observe));
+
+    if (observe) {
+        socket.emit("observe", {poker: state.room});
+        return;
+    }
+
+    socket.emit("join", {poker: state.room, name: state.user.name});
+}
+
+export const changeRoom = (value: string) => {
+    const state = store.getState();
+
+    const newRoom = value.toLowerCase();
+
+    if (state.room === newRoom) {
+        return;
+    }
+
+    if (state.room) {
+        socket.emit("leave", {poker: state.room});
+    }
+
+    socket.emit("join", {poker: newRoom, name: state.user.name});
+}
+
+export const changeName = (value: string) => {
+    const state = store.getState();
+
+    if (state.user.name === value) {
+        return;
+    }
+
+    socket.emit("nickname", {poker: state.room, name: value});
+    setUserName(value);
+}
+
+export const changeStoryName = (value: string) => {
+    const state = store.getState();
+
+    if (state.story === value) {
+        return;
+    }
+
+    socket.emit("changeStoryName", {poker: state.room, name: value});
 }
 
 export default store;
@@ -96,3 +166,6 @@ export * from './votes';
 export * from './points';
 export * from './room';
 export * from './general';
+
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch
