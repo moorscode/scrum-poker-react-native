@@ -3,10 +3,13 @@ import user, {gotUserId, setUserName, setUserObserver} from './user';
 import votes, {
     gotGroupedVoterNames,
     gotMyCurrentVote,
-    gotMyInitialVote, gotNearestPointAverage,
+    gotMyInitialVote,
+    gotNearestPointAverage,
     gotVoteAverage,
-    gotVoteCount, gotVotedNames,
-    gotVotes, gotVotesRevealed,
+    gotVoteCount,
+    gotVotedNames,
+    gotVotes,
+    gotVotesRevealed,
     MyVote,
     Vote,
     Votes
@@ -17,23 +20,37 @@ import app, {setBackgroundColor, setReady} from './app';
 import story, {gotStory} from './story';
 import socket from '../utils/Socket';
 import members, {gotMembers, MemberList} from "./members";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const reducers = combineReducers({room, votes, user, points, app, story, members});
 const store = createStore(reducers);
 
+AsyncStorage.getItem("username").then((username) => {
+    if (username) {
+        store.dispatch(setUserName(username));
+    }
+});
+
+let storedRoom: string;
+AsyncStorage.getItem("room").then((room) => {
+    if (room) {
+        storedRoom = room;
+    }
+});
+
 const backgroundColor = () => {
     const state = store.getState();
-    if ( state.votes.voteCount === 0 || state.votes.voteCount < state.members.voters.length || typeof state.votes.voteAverage === "string" ) {
+    if (state.votes.voteCount === 0 || state.votes.voteCount < state.members.voters.length || typeof state.votes.voteAverage === "string") {
         return "#eee";
     }
 
     // Find the difference between the lowest and the highest votes.
-    const lowestIndex = state.points.indexOf( state.votes.votes[ 0 ].currentValue );
-    const highestIndex = state.points.indexOf( state.votes.votes[ state.votes.votes.length - 1 ].currentValue );
+    const lowestIndex = state.points.indexOf(state.votes.votes[0].currentValue);
+    const highestIndex = state.points.indexOf(state.votes.votes[state.votes.votes.length - 1].currentValue);
 
     const pointsSpread = highestIndex - lowestIndex;
 
-    switch ( true ) {
+    switch (true) {
         case pointsSpread === 0:
             return "#82a159";
         case pointsSpread >= 2:
@@ -54,7 +71,12 @@ socket.on("disconnect", () => {
 });
 
 socket.on("welcome", () => {
-    // changeRoom("test");
+    const state = store.getState();
+    if (storedRoom) {
+        socket.emit("join", {poker: storedRoom, name: state.user.name});
+        return;
+    }
+
     store.dispatch(setReady(true));
 });
 
@@ -68,6 +90,9 @@ socket.on("myVote", (myVote: MyVote) => {
 });
 
 socket.on("joined", (room: string) => {
+    store.dispatch(setReady(true));
+
+    AsyncStorage.setItem("room", room);
     store.dispatch(gotRoom(room));
 });
 
@@ -93,7 +118,7 @@ socket.on("votes", (votesData: Votes) => {
     store.dispatch(gotGroupedVoterNames(votesData.groupedVoterNames || {}));
     store.dispatch(gotNearestPointAverage(votesData.nearestPointAverage));
 
-    store.dispatch(setBackgroundColor( backgroundColor() ) );
+    store.dispatch(setBackgroundColor(backgroundColor()));
 });
 
 socket.on("points", (data: number[] | string[]) => {
@@ -103,7 +128,7 @@ socket.on("points", (data: number[] | string[]) => {
 export const vote = (value: number | string) => {
     const state = store.getState();
 
-    if ( state.user.observer ) {
+    if (state.user.observer) {
         return;
     }
 
@@ -126,11 +151,8 @@ export const finishRefinement = () => {
 }
 
 export const setObserving = (observe: boolean) => {
-    console.log('observing', observe);
     const state = store.getState();
-
     if (state.user.observer === observe) {
-        console.log('no change', observe);
         return;
     }
 
@@ -145,8 +167,11 @@ export const setObserving = (observe: boolean) => {
 }
 
 export const changeRoom = (value: string) => {
-    const state = store.getState();
+    if ( ! value ) {
+        return;
+    }
 
+    const state = store.getState();
     const newRoom = value.toLowerCase();
 
     if (state.room === newRoom) {
@@ -162,13 +187,16 @@ export const changeRoom = (value: string) => {
 
 export const changeName = (value: string) => {
     const state = store.getState();
-
-    if (state.user.name === value) {
+    if (!state.app.ready) {
         return;
     }
 
-    socket.emit("nickname", {poker: state.room, name: value});
-    setUserName(value);
+    if (state.room) {
+        socket.emit("nickname", {poker: state.room, name: value});
+    }
+
+    store.dispatch(setUserName(value));
+    AsyncStorage.setItem("username", value);
 }
 
 export const changeStoryName = (value: string) => {

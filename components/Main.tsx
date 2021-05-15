@@ -47,6 +47,7 @@ const Main = (props: Props) => {
 
     return (
         <>
+            <Text style={styles.header}>Pum Scroker</Text>
             <View style={styles.sideBySide}>
                 <Room/>
                 {props.room !== "" && <Finish/>}
@@ -68,6 +69,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    header: {
+        fontSize: 32,
+        fontWeight: "bold",
+        marginBottom: 8,
+        marginHorizontal: 4,
+        color: "#a4286a",
+        alignSelf: "flex-start",
     },
     sideBySide: {
         flexDirection: "row",

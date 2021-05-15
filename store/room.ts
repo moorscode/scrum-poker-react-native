@@ -1,3 +1,5 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 const GOT_ROOM = 'GOT_ROOM';
 
 export const gotRoom = (name: string) => ({type: GOT_ROOM, name});

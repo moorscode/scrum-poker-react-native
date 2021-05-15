@@ -17,6 +17,10 @@ const Username = ({name}: Props) => {
         changeName(debouncedName);
     }, [debouncedName]);
 
+    useEffect(() => {
+        setNameInput(name);
+    }, [name]);
+
     return (
         <View style={styles.container}>
             <Text style={styles.text}>Name: </Text>

@@ -1,8 +1,8 @@
 {
   "name": "scrum-poker-react-native",
-  "displayName": "scrum-poker-react-native",
+  "displayName": "Scrum Poker",
   "expo": {
-    "name": "scrum-poker-react-native",
+    "name": "Scrum Poker",
     "slug": "scrum-poker-react-native",
     "version": "1.0.0",
     "assetBundlePatterns": [

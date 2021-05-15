@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
         minWidth: 60,
         borderRadius: 2,
         textTransform: "uppercase",
+        marginRight: 4,
 
     },
     buttonView: {

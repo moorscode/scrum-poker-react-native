@@ -17,6 +17,10 @@ const Room = ({name}: Props) => {
         changeRoom(debouncedName);
     }, [debouncedName]);
 
+    useEffect(() => {
+        setNameInput(name);
+    }, [name]);
+
     return (
         <View style={styles.container}>
             <Text style={styles.text}>Room: </Text>
