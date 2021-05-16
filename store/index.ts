@@ -38,7 +38,7 @@ AsyncStorage.getItem("room").then((room) => {
     }
 });
 
-const backgroundColor = () => {
+const determineBackgroundColor = () => {
     const state = store.getState();
     if (state.votes.voteCount === 0 || state.votes.voteCount < state.members.voters.length || typeof state.votes.voteAverage === "string") {
         return "#eee";
@@ -106,7 +106,7 @@ socket.on("votes", (votesData: Votes) => {
     }
 
     const votes = votesData.votes.sort(
-        (a: Vote, b: Vote) => parseInt(a.currentValue, 10) - parseInt(b.currentValue, 10)
+        (a: Vote, b: Vote) => parseInt("" + a.currentValue, 10) - parseInt( "" + b.currentValue, 10)
     ) || [];
 
     store.dispatch(gotVotes(votes));
@@ -117,7 +117,7 @@ socket.on("votes", (votesData: Votes) => {
     store.dispatch(gotGroupedVoterNames(votesData.groupedVoterNames || {}));
     store.dispatch(gotNearestPointAverage(votesData.nearestPointAverage));
 
-    store.dispatch(setBackgroundColor(backgroundColor()));
+    store.dispatch(setBackgroundColor(determineBackgroundColor()));
 });
 
 socket.on("points", (data: number[] | string[]) => {
@@ -218,6 +218,7 @@ export * from './votes';
 export * from './points';
 export * from './room';
 export * from './app';
+export * from './story';
+export * from './members';
 
-export type RootState = ReturnType<typeof store.getState>
-export type AppDispatch = typeof store.dispatch
+export type RootState = ReturnType<typeof store.getState>;
