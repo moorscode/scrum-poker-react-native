@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "flex-start",
         margin: 24,
-        marginTop: 50,
+        marginTop: __DEV__ ? 50 : 24,
         marginBottom: 0,
         padding: 10,
         borderRadius: 10,
