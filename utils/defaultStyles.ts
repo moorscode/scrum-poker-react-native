@@ -53,11 +53,13 @@ const defaultStyles:StyleDefinition = {
         marginBottom: 8,
     },
     input: {
-        paddingHorizontal: 5,
         marginHorizontal: 2,
         fontSize: 16,
         width: 120,
-        borderWidth: 1,
+        color: "#a4286a",
+        paddingLeft: 2,
+        borderBottomWidth: 1,
+        borderBottomColor: "#a4286a",
     },
     label: {
         fontSize: 16,

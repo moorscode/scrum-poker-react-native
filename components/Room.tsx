@@ -10,7 +10,7 @@ type Props = {
 }
 
 const Room = ({name}: Props) => {
-    const [nameInput, setNameInput] = useState(name);
+    const [nameInput, setNameInput] = useState("");
 
     const debouncedName = useDebounce(nameInput, 750);
 
@@ -19,7 +19,7 @@ const Room = ({name}: Props) => {
     }, [debouncedName]);
 
     useEffect(() => {
-        setNameInput(name);
+        setNameInput("");
     }, [name]);
 
     return (
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         alignContent: "flex-start",
         margin: 4,
-    },
+    }
 });
 
 export default connect((state: RootState) => ({name: state.room}))(Room);

@@ -71,9 +71,8 @@ socket.on("disconnect", () => {
 });
 
 socket.on("welcome", () => {
-    const state = store.getState();
     if (storedRoom) {
-        socket.emit("join", {poker: storedRoom, name: state.user.name});
+        joinRoom(storedRoom);
         return;
     }
 
@@ -127,7 +126,6 @@ socket.on("points", (data: number[] | string[]) => {
 
 export const vote = (value: number | string) => {
     const state = store.getState();
-
     if (state.user.observer) {
         return;
     }
@@ -163,26 +161,31 @@ export const setObserving = (observe: boolean) => {
         return;
     }
 
-    socket.emit("join", {poker: state.room, name: state.user.name});
+    joinRoom(state.room);
 }
 
-export const changeRoom = (value: string) => {
-    if ( ! value ) {
+export const changeRoom = (newRoom: string) => {
+    if (!newRoom) {
         return;
     }
 
     const state = store.getState();
-    const newRoom = value.toLowerCase();
 
-    if (state.room === newRoom) {
+    if (state.room.toLowerCase() === newRoom.toLowerCase()) {
         return;
     }
 
     if (state.room) {
-        socket.emit("leave", {poker: state.room});
+        socket.emit("leave", {poker: state.room.toLowerCase()});
     }
 
-    socket.emit("join", {poker: newRoom, name: state.user.name});
+    console.log(newRoom);
+    joinRoom(newRoom);
+}
+
+const joinRoom = (room: string) => {
+    const state = store.getState();
+    socket.emit("join", {poker: room.toLowerCase(), name: state.user.name});
 }
 
 export const changeName = (value: string) => {
