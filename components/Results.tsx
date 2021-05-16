@@ -1,7 +1,8 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {StyleSheet, Text, View} from "react-native";
 import {connect} from "react-redux";
 import {RootState, Vote, VoteValue} from "../store";
+import defaultStyles from "../utils/defaultStyles";
 
 type Props = {
     votes: Vote[];
@@ -13,41 +14,34 @@ type Props = {
 }
 
 const Results = ({votes, voteAverage, nearestPointAverage, voters, voteCount, points}: Props) => {
-    const getVoteDisplay = (vote: Vote) => {
-        let initial;
-        if (vote.currentValue !== vote.initialValue) {
-            initial = <Text>({"" + vote.initialValue})</Text>;
-        }
+    const [average, setAverage] = useState("");
+    const [averageContext, setAverageContext] = useState("");
+    const [standardDeviation, setStandardDeviation] = useState("");
 
-        return <View style={styles.voter}>
-            <Text style={styles.vote}>{vote.currentValue}</Text>
-            <Text style={styles.buttonView}>{vote.voterName}</Text>
-            {initial}
-        </View>;
-    }
-
-    const getAverage = () => {
+    useEffect(() => {
         if (voteCount === 0 || voteCount < voters.length) {
-            return "";
+            setAverage("");
+            return;
         }
 
         if (voteAverage === "coffee") {
-            return "Coffee break";
+            setAverage("Coffee break");
+            return;
         }
 
         if (voteAverage === "?") {
-            return "Not enough clarity, please go further in depth.";
+            setAverage("Not enough clarity, please go further in depth.");
         }
 
-        // @ts-ignore
-        return Math.round(voteAverage * 100) / 100;
-    }
+        if (typeof voteAverage === "number") {
+            setAverage("" + Math.round(voteAverage * 100) / 100);
+        }
+    }, [voteAverage, voteCount]);
 
-    const average = getAverage();
-
-    const averageContext = () => {
+    useEffect(() => {
         if (average === "") {
-            return "";
+            setAverageContext("");
+            return;
         }
 
         // Find the difference between the lowest and the highest votes.
@@ -56,70 +50,86 @@ const Results = ({votes, voteAverage, nearestPointAverage, voters, voteCount, po
 
         const highestNumericPoint = points.filter((point: VoteValue) => typeof point === "number").length;
         if (highestIndex >= highestNumericPoint) {
-            return "";
+            setAverageContext("");
+            return;
         }
 
         if (highestIndex - lowestIndex > 2) {
-            return `Large gap between lowest and highest vote: ${highestIndex - lowestIndex} cards!`;
+            setAverageContext(`Large gap between lowest and highest vote: ${highestIndex - lowestIndex} cards!`);
         }
-    }
+    }, [average, votes]);
 
-    const standardDeviation = () => {
+    useEffect(() => {
         if (average === "") {
-            return "";
+            setStandardDeviation("");
+            return;
         }
 
-        if (votes.length <= 1) {
-            return "n/a";
+        if (votes.length < 1) {
+            setStandardDeviation("n/a");
+            return;
         }
 
-        const flattendVotes = votes.map((vote: Vote) => vote.currentValue);
+        const flattenedVotes = votes.map((vote: Vote) => vote.currentValue);
 
-        if (flattendVotes.indexOf("coffee") !== -1) {
-            return "n/a";
+        if (flattenedVotes.indexOf("coffee") !== -1) {
+            setStandardDeviation("n/a");
+            return;
         }
 
-        if (flattendVotes.indexOf("?") !== -1) {
-            return "n/a";
+        if (flattenedVotes.indexOf("?") !== -1) {
+            setStandardDeviation("n/a");
+            return;
         }
 
         let powers = 0;
         for (let i = 0; i < votes.length; i++) {
-            powers += Math.pow(parseFloat(votes.map((vote: Vote) => vote.currentValue)[i]) - average, 2);
+            powers += Math.pow(parseFloat(votes.map((vote: Vote) => "" + vote.currentValue)[i]) - parseInt(average, 10), 2);
         }
 
-        return Math.round(Math.sqrt(powers / votes.length) * 100) / 100;
+        setStandardDeviation("" + Math.round(Math.sqrt(powers / votes.length) * 100) / 100);
+    }, [average, votes]);
+
+    const getVoteDisplay = (vote: Vote) => {
+        let initial;
+        if (vote.currentValue !== vote.initialValue) {
+            initial = <Text>({"" + vote.initialValue})</Text>;
+        }
+
+        return <View style={styles.voter}>
+            <Text style={styles.vote}>{vote.currentValue}</Text>
+            <Text style={styles.smallMargin}>{vote.voterName}</Text>
+            {initial}
+        </View>;
     }
 
-    let context = averageContext();
-
     let contextView;
-    if (context !== "") {
+    if (averageContext !== "") {
         contextView = <View style={styles.spaceBelow}>
-            {context && <Text style={styles.bold}>Average story point: {context}</Text>}
+            <Text style={styles.alignCenterBold}>Average story point: {averageContext}</Text>
         </View>;
     }
 
     let stats;
     if (average !== "") {
-        stats = <View style={styles.statsContainer}>
+        stats = <View>
             <Text style={styles.stats}>Average: {average}</Text>
-            <Text style={styles.stats}>Standard deviation: {standardDeviation()}</Text>
-            <Text style={styles.statsBold}>Average story point: {average ? nearestPointAverage : average}</Text>
+            <Text style={styles.stats}>Standard deviation: {standardDeviation}</Text>
+            <Text style={styles.alignRightBold}>Average story point: {average ? nearestPointAverage : average}</Text>
         </View>;
     }
 
     return (
         <>
             {contextView}
-            <View style={styles.container}>
+            <View style={styles.voteContainer}>
                 <View style={styles.voteList}>
                     {
                         votes.map(
                             (vote: Vote, index: number) => {
                                 return <View
                                     key={"result" + index}
-                                    style={styles.buttonView}>
+                                    style={styles.smallMargin}>
                                     {getVoteDisplay(vote)}
                                 </View>;
                             }
@@ -133,14 +143,12 @@ const Results = ({votes, voteAverage, nearestPointAverage, voters, voteCount, po
 }
 
 const styles = StyleSheet.create({
+    ...defaultStyles,
     voteList: {
         flexDirection: "column",
         justifyContent: "flex-start",
         alignContent: "center",
         flexWrap: "wrap",
-    },
-    spaceBelow: {
-        marginBottom: 8,
     },
     vote: {
         padding: 5,
@@ -152,29 +160,25 @@ const styles = StyleSheet.create({
         marginRight: 4,
 
     },
-    buttonView: {
-        margin: 2,
-    },
     voter: {
         flexDirection: "row",
         justifyContent: "flex-start",
         alignItems: "center",
         margin: 2,
     },
-    statsContainer: {},
     stats: {
         textAlign: "right",
         flexWrap: "wrap",
     },
-    statsBold: {
+    alignRightBold: {
+        ...defaultStyles.bold,
         textAlign: "right",
-        fontWeight: "bold",
     },
-    bold: {
-        fontWeight: "bold",
+    alignCenterBold: {
+        ...defaultStyles.bold,
         textAlign: "center",
     },
-    container: {
+    voteContainer: {
         width: 340,
         marginHorizontal: 4,
         flexDirection: "row",

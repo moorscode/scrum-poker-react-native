@@ -9,7 +9,7 @@ import Username from "./Username";
 import Room from "./Room";
 import Story from "./Story";
 import {Finish} from "./Finish";
-import VoteStatus from "./VoteStatus";
+import defaultStyles from "../utils/defaultStyles";
 
 const Separator = () => (
     <View style={styles.separator}/>
@@ -33,7 +33,7 @@ const Main = (props: Props) => {
     if (props.room !== "") {
         inRoomChildren =
             <>
-                <View style={styles.sideBySide}>
+                <View style={styles.sideBySideFullWidth}>
                     <Username/>
                     <Observer/>
                 </View>
@@ -47,8 +47,8 @@ const Main = (props: Props) => {
 
     return (
         <>
-            <Text style={styles.header}>Pum Scroker</Text>
-            <View style={styles.sideBySide}>
+            <Text style={styles.h1}>Pum Scroker</Text>
+            <View style={styles.sideBySideFullWidth}>
                 <Room/>
                 {props.room !== "" && <Finish/>}
             </View>
@@ -57,35 +57,7 @@ const Main = (props: Props) => {
     );
 }
 
-const styles = StyleSheet.create({
-    separator: {
-        marginVertical: 8,
-        borderBottomColor: '#333',
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        minHeight: 2,
-    },
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    header: {
-        fontSize: 32,
-        fontWeight: "bold",
-        marginBottom: 8,
-        marginHorizontal: 4,
-        color: "#a4286a",
-        alignSelf: "flex-start",
-    },
-    sideBySide: {
-        flexDirection: "row",
-        alignContent: "space-between",
-        alignItems: "center",
-        justifyContent: "space-between",
-        width: 340,
-    },
-});
+const styles = StyleSheet.create(defaultStyles);
 
 export default connect((state: RootState) => {
     return {ready: state.app.ready, user: state.user, room: state.room, story: state.story}

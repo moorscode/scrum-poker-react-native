@@ -3,6 +3,7 @@ import React, {useEffect, useState} from "react";
 import {connect} from "react-redux";
 import {changeName, RootState} from "../store";
 import useDebounce from "../utils/useDebounce";
+import defaultStyles from "../utils/defaultStyles";
 
 type Props = {
     name: string;
@@ -22,31 +23,21 @@ const Username = ({name}: Props) => {
     }, [name]);
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.text}>Name: </Text>
+        <View style={styles.userContainer}>
+            <Text style={styles.label}>Name: </Text>
             <TextInput style={styles.input} onChangeText={setNameInput} value={nameInput}/>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
+    ...defaultStyles,
+    userContainer: {
         flexDirection: "row",
         alignItems: "center",
         alignContent: "center",
         flexWrap: 'wrap',
         margin: 4,
-    },
-    input: {
-        paddingHorizontal: 5,
-        marginHorizontal: 2,
-        fontSize: 16,
-        width: 120,
-        borderWidth: 1,
-    },
-    text: {
-        minWidth: 50,
-        fontSize: 16,
     },
 });
 

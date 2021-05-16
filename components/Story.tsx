@@ -3,6 +3,7 @@ import React, {useEffect, useState} from "react";
 import {connect} from "react-redux";
 import {changeStoryName, newStory, RootState} from "../store";
 import useDebounce from "../utils/useDebounce";
+import defaultStyles from "../utils/defaultStyles";
 
 type Props = {
     name: string;
@@ -22,9 +23,9 @@ const Story = ({name}: Props) => {
     }, [name]);
 
     return (
-        <View style={styles.sideBySide}>
-            <View style={styles.container}>
-                <Text style={styles.text}>Story: </Text>
+        <View style={styles.sideBySideFullWidth}>
+            <View style={styles.storyContainer}>
+                <Text style={styles.label}>Story: </Text>
                 <TextInput style={styles.input} onChangeText={setNameInput} value={nameInput}/>
             </View>
             <Button onPress={newStory} title="New story"/>
@@ -33,32 +34,14 @@ const Story = ({name}: Props) => {
 }
 
 const styles = StyleSheet.create({
-    container: {
+    ...defaultStyles,
+    storyContainer: {
         flexDirection: "row",
         alignItems: "center",
         alignContent: "center",
         flexWrap: 'wrap',
         margin: 4,
     },
-    input: {
-        paddingHorizontal: 5,
-        marginHorizontal: 2,
-        fontSize: 16,
-        width: 120,
-        borderWidth: 1,
-        marginRight: 10,
-    },
-    text: {
-        fontSize: 16,
-        minWidth: 50,
-    },
-    sideBySide: {
-        flexDirection: "row",
-        alignContent: "space-between",
-        justifyContent: "space-between",
-        width: 340,
-        alignItems: "center",
-    }
 });
 
 export default connect((state: RootState) => ({name: state.story}))(Story);

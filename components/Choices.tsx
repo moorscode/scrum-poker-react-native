@@ -2,6 +2,7 @@ import React from "react";
 import {Button, StyleSheet, Text, View} from "react-native";
 import {connect} from "react-redux";
 import {RootState, VoteValue} from "../store";
+import defaultStyles from "../utils/defaultStyles";
 
 type Props = {
     choices: VoteValue[];
@@ -13,7 +14,7 @@ type Props = {
 const Choices = ({choices, myCurrentVote, myInitialVote, onChoice}: Props) => {
     return (
         <>
-            <Text style={styles.heading}>Choices</Text>
+            <Text style={styles.h2}>Choices</Text>
             <View style={styles.voteList}>
                 {
                     choices.map(
@@ -21,11 +22,11 @@ const Choices = ({choices, myCurrentVote, myInitialVote, onChoice}: Props) => {
                             const color = (myCurrentVote === choice) ? "#a4286a" : ((myInitialVote === choice) ? "" : "#82a159");
                             return <View
                                 key={"choice " + choice}
-                                style={styles.buttonView}>
+                                style={styles.smallMargin}>
                                 <Button
                                     color={color}
                                     title={"" + choice}
-                                    onPress={(event) => onChoice(choice)}
+                                    onPress={() => onChoice(choice)}
                                 />
                             </View>;
                         }
@@ -36,11 +37,9 @@ const Choices = ({choices, myCurrentVote, myInitialVote, onChoice}: Props) => {
     );
 }
 
+// @ts-ignore
 const styles = StyleSheet.create({
-    heading: {
-        fontSize: 20,
-        fontWeight: "bold",
-    },
+    ...defaultStyles,
     voteList: {
         flexDirection: "row",
         justifyContent: "space-evenly",
@@ -50,9 +49,6 @@ const styles = StyleSheet.create({
         width: 400,
         marginTop: 4,
     },
-    buttonView: {
-        margin: 2,
-    }
 })
 
 export default connect((state: RootState) => {

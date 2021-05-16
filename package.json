@@ -5,6 +5,7 @@
     "ios": "react-native run-ios",
     "web": "expo start --web",
     "start": "react-native start",
+    "android-release": "react-native run-android --variant=release",
     "test": "jest"
   },
   "dependencies": {
