@@ -16,13 +16,14 @@ import votes, {
 } from './votes';
 import points, {gotPoints} from './points';
 import room, {gotRoom} from './room';
+import storedRoom, {setStoredRoom} from './storedRoom';
 import app, {setBackgroundColor, setReady} from './app';
 import story, {gotStory} from './story';
 import socket from '../utils/Socket';
 import members, {gotMembers, MemberList} from "./members";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const reducers = combineReducers({room, votes, user, points, app, story, members});
+const reducers = combineReducers({room, votes, user, points, app, story, members, storedRoom});
 const store = createStore(reducers);
 
 AsyncStorage.getItem("username").then((username) => {
@@ -31,10 +32,9 @@ AsyncStorage.getItem("username").then((username) => {
     }
 });
 
-let storedRoom: string;
 AsyncStorage.getItem("room").then((room) => {
     if (room) {
-        storedRoom = room;
+        store.dispatch(setStoredRoom(room));
     }
 });
 
@@ -71,9 +71,9 @@ socket.on("disconnect", () => {
 });
 
 socket.on("welcome", () => {
-    if (storedRoom) {
-        joinRoom(storedRoom);
-        return;
+    const state = store.getState();
+    if (state.storedRoom) {
+        joinRoom(state.storedRoom);
     }
 
     store.dispatch(setReady(true));
@@ -179,7 +179,6 @@ export const changeRoom = (newRoom: string) => {
         socket.emit("leave", {poker: state.room.toLowerCase()});
     }
 
-    console.log(newRoom);
     joinRoom(newRoom);
 }
 

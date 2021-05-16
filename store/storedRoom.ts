@@ -1,12 +1,12 @@
-const GOT_ROOM = 'GOT_ROOM';
+const SET_STORED_ROOM = 'SET_STORED_ROOM';
 
-export const gotRoom = (room: string) => ({type: GOT_ROOM, room});
+export const setStoredRoom = (room: string) => ({type: SET_STORED_ROOM, room});
 
 type Room = string;
 
 const reducer = (state: Room = '', action: any) => {
     switch (action.type) {
-        case GOT_ROOM:
+        case SET_STORED_ROOM:
             return action.room;
         default:
             return state;
