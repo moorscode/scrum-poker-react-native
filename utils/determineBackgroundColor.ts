@@ -1,4 +1,6 @@
-export default (voteCount, voterCount, voteAverage, votes, points) => {
+import {Vote, VoteValue} from "../store";
+
+export default (voteCount: number, voterCount: number, voteAverage: VoteValue, votes: Vote[], points: VoteValue[]): string => {
     if (voteCount === 0 || voteCount < voterCount || typeof voteAverage === "string") {
         return "#eee";
     }
