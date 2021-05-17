@@ -23,7 +23,9 @@ type Props = {
 const Main = (props: Props) => {
     if (!props.ready) {
         return (
-            <View><Text>Connecting to the server...</Text></View>
+            <View style={styles.sideBySideFullWidth}>
+                <Text>Connecting to the server...</Text>
+            </View>
         );
     }
 
@@ -45,7 +47,9 @@ const Main = (props: Props) => {
 
     return (
         <>
-            <Text style={styles.h1}>Pum Scroker</Text>
+            <View style={styles.sideBySideFullWidth}>
+                <Text style={styles.h1}>Pum Scroker</Text>
+            </View>
             <View style={styles.sideBySideFullWidth}>
                 <Room/>
                 {props.room !== "" && <Finish/>}
