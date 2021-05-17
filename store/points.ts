@@ -1,6 +1,8 @@
+import {VoteValue} from "./votes";
+
 const GOT_POINTS = 'GOT_POINTS';
 
-export const gotPoints = (points: number[]|string[]) => ({type: GOT_POINTS, points});
+export const gotPoints = (points: VoteValue[]) => ({type: GOT_POINTS, points});
 
 const reducer = (state = [], action: any) => {
     switch (action.type) {

@@ -12,7 +12,8 @@ import votes, {
     gotVotesRevealed,
     MyVote,
     Vote,
-    Votes
+    Votes,
+    VoteValue
 } from './votes';
 import points, {gotPoints} from './points';
 import room, {gotRoom} from './room';
@@ -21,6 +22,7 @@ import story, {gotStory} from './story';
 import socket from '../utils/Socket';
 import members, {gotMembers, MemberList} from "./members";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import determineBackgroundColor from "../utils/determineBackgroundColor";
 
 const reducers = combineReducers({room, votes, user, points, app, story, members});
 const store = createStore(reducers);
@@ -42,28 +44,6 @@ AsyncStorage.multiGet(["username", "room"]).then((results) => {
         }
     });
 });
-
-const determineBackgroundColor = () => {
-    const state = store.getState();
-    if (state.votes.voteCount === 0 || state.votes.voteCount < state.members.voters.length || typeof state.votes.voteAverage === "string") {
-        return "#eee";
-    }
-
-    // Find the difference between the lowest and the highest votes.
-    const lowestIndex = state.points.indexOf(state.votes.votes[0].currentValue);
-    const highestIndex = state.points.indexOf(state.votes.votes[state.votes.votes.length - 1].currentValue);
-
-    const pointsSpread = highestIndex - lowestIndex;
-
-    switch (true) {
-        case pointsSpread === 0:
-            return "#82a159";
-        case pointsSpread >= 2:
-            return "#c94545";
-        default:
-            return "#eee";
-    }
-}
 
 socket.on("userId", (userId: string) => {
     store.dispatch(gotUserId(userId));
@@ -110,7 +90,7 @@ socket.on("votes", (votesData: Votes) => {
     }
 
     const votes = votesData.votes.sort(
-        (a: Vote, b: Vote) => parseInt("" + a.currentValue, 10) - parseInt( "" + b.currentValue, 10)
+        (a: Vote, b: Vote) => parseInt("" + a.currentValue, 10) - parseInt("" + b.currentValue, 10)
     ) || [];
 
     store.dispatch(gotVotes(votes));
@@ -121,14 +101,25 @@ socket.on("votes", (votesData: Votes) => {
     store.dispatch(gotGroupedVoterNames(votesData.groupedVoterNames || {}));
     store.dispatch(gotNearestPointAverage(votesData.nearestPointAverage));
 
-    store.dispatch(setBackgroundColor(determineBackgroundColor()));
+    const state = store.getState();
+    store.dispatch(
+        setBackgroundColor(
+            determineBackgroundColor(
+                votesData.voteCount,
+                state.members.voters.length,
+                votesData.voteAverage,
+                votes,
+                state.points
+            )
+        )
+    );
 });
 
-socket.on("points", (data: number[] | string[]) => {
+socket.on("points", (data: VoteValue[]) => {
     store.dispatch(gotPoints(data));
 });
 
-export const vote = (value: number | string) => {
+export const vote = (value: VoteValue) => {
     const state = store.getState();
     if (state.user.observer) {
         return;
@@ -197,11 +188,16 @@ export const changeName = (value: string) => {
         return;
     }
 
+    if (value === state.user.name) {
+        return;
+    }
+
+    store.dispatch(setUserName(value));
+
     if (state.room) {
         socket.emit("nickname", {poker: state.room, name: value});
     }
 
-    store.dispatch(setUserName(value));
     AsyncStorage.setItem("username", value);
 }
 
