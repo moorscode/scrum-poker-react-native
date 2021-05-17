@@ -19,7 +19,7 @@ import points, {gotPoints} from './points';
 import room, {gotRoom} from './room';
 import app, {setBackgroundColor, setReady} from './app';
 import story, {gotStory} from './story';
-import socket from '../utils/Socket';
+import socket from '../utils/socket';
 import members, {gotMembers, MemberList} from "./members";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import determineBackgroundColor from "../utils/determineBackgroundColor";

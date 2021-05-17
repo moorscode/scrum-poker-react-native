@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import Main from "./components/Main";
 import {Provider} from 'react-redux';
 import store, {RootState} from './store';
-import socket from './utils/Socket';
+import socket from './utils/socket';
 import {SafeAreaView, StyleSheet, View} from "react-native";
 
 function App() {
