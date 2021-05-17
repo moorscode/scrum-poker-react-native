@@ -3,7 +3,7 @@ import Choices from "./Choices";
 import React from "react";
 import Results from "./Results";
 import {connect} from "react-redux";
-import {RootState, User, vote} from "../store";
+import {RootState, vote} from "../store";
 import Observer from "./Observer";
 import Username from "./Username";
 import Room from "./Room";
@@ -18,8 +18,6 @@ const Separator = () => (
 type Props = {
     ready: boolean;
     room: string;
-    story: string;
-    user: User;
 }
 
 const Main = (props: Props) => {
@@ -57,8 +55,12 @@ const Main = (props: Props) => {
     );
 }
 
+// @ts-ignore
 const styles = StyleSheet.create(defaultStyles);
 
 export default connect((state: RootState) => {
-    return {ready: state.app.ready, user: state.user, room: state.room, story: state.story}
+    return {
+        ready: state.app.ready,
+        room: state.room,
+    }
 })(Main);
