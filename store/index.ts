@@ -16,26 +16,31 @@ import votes, {
 } from './votes';
 import points, {gotPoints} from './points';
 import room, {gotRoom} from './room';
-import storedRoom, {setStoredRoom} from './storedRoom';
 import app, {setBackgroundColor, setReady} from './app';
 import story, {gotStory} from './story';
 import socket from '../utils/Socket';
 import members, {gotMembers, MemberList} from "./members";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const reducers = combineReducers({room, votes, user, points, app, story, members, storedRoom});
+const reducers = combineReducers({room, votes, user, points, app, story, members});
 const store = createStore(reducers);
 
-AsyncStorage.getItem("username").then((username) => {
-    if (username) {
-        store.dispatch(setUserName(username));
-    }
-});
+const storageReducers = combineReducers({room});
+const storageStore = createStore(storageReducers);
 
-AsyncStorage.getItem("room").then((room) => {
-    if (room) {
-        store.dispatch(setStoredRoom(room));
-    }
+AsyncStorage.multiGet(["username", "room"]).then((results) => {
+    results.map(([key, value]) => {
+        if (!value) {
+            return;
+        }
+
+        if (key === "username") {
+            store.dispatch(setUserName(value));
+        }
+        if (key === "room") {
+            storageStore.dispatch(gotRoom(value));
+        }
+    });
 });
 
 const determineBackgroundColor = () => {
@@ -62,7 +67,6 @@ const determineBackgroundColor = () => {
 
 socket.on("userId", (userId: string) => {
     store.dispatch(gotUserId(userId));
-    store.dispatch(setReady(true));
     socket.emit("identify", {id: userId});
 });
 
@@ -71,9 +75,9 @@ socket.on("disconnect", () => {
 });
 
 socket.on("welcome", () => {
-    const state = store.getState();
-    if (state.storedRoom) {
-        joinRoom(state.storedRoom);
+    const state = storageStore.getState();
+    if (state.room) {
+        joinRoom(state.room);
     }
 
     store.dispatch(setReady(true));
