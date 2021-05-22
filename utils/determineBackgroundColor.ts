@@ -1,4 +1,5 @@
 import {Vote, VoteValue} from "../store";
+import {colors} from "./defaultStyles";
 
 export default (voteCount: number, voterCount: number, voteAverage: VoteValue, votes: Vote[], points: VoteValue[]): string => {
     if (voteCount === 0 || voteCount < voterCount || typeof voteAverage === "string") {
@@ -13,10 +14,10 @@ export default (voteCount: number, voterCount: number, voteAverage: VoteValue, v
 
     switch (true) {
         case pointsSpread === 0:
-            return "#82a159";
+            return colors.green;
         case pointsSpread >= 2:
-            return "#c94545";
+            return colors.red;
         default:
-            return "#eee";
+            return colors.lightGray;
     }
 }

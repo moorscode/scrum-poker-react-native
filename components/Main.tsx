@@ -9,7 +9,9 @@ import Username from "./Username";
 import Room from "./Room";
 import Story from "./Story";
 import {Finish} from "./Finish";
-import defaultStyles from "../utils/defaultStyles";
+import defaultStyles, {colors} from "../utils/defaultStyles";
+import {ActivityIndicator} from "react-native-paper";
+import Members from "./Members";
 
 const Separator = () => (
     <View style={styles.separator}/>
@@ -23,9 +25,10 @@ type Props = {
 const Main = (props: Props) => {
     if (!props.ready) {
         return (
-            <View style={styles.sideBySideFullWidth}>
-                <Text>Connecting to the server...</Text>
-            </View>
+            <>
+                <Text style={ { marginTop: 16, marginBottom: 32, fontSize: 16 } }>Connecting to the server...</Text>
+                <ActivityIndicator animating={true} size="large" color={ colors.pink }/>
+            </>
         );
     }
 
@@ -42,6 +45,7 @@ const Main = (props: Props) => {
                 <Choices onChoice={vote}/>
                 <Separator/>
                 <Results/>
+                <Members/>
             </>;
     }
 

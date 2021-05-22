@@ -2,7 +2,8 @@ import React from "react";
 import {Button, StyleSheet, Text, View} from "react-native";
 import {connect} from "react-redux";
 import {RootState, VoteValue} from "../store";
-import defaultStyles from "../utils/defaultStyles";
+import defaultStyles, { colors } from "../utils/defaultStyles";
+import {Chip} from "react-native-paper";
 
 type Props = {
     choices: VoteValue[];
@@ -23,11 +24,16 @@ const Choices = ({choices, myCurrentVote, myInitialVote, onChoice}: Props) => {
                             return <View
                                 key={"choice " + choice}
                                 style={styles.smallMargin}>
-                                <Button
-                                    color={color}
-                                    title={"" + choice}
+                                <Chip
+                                    mode="outlined"
                                     onPress={() => onChoice(choice)}
-                                />
+                                    selected={myCurrentVote === choice}
+                                    selectedColor={myCurrentVote === choice ? "#fff": "#000"}
+                                    style={myCurrentVote === choice ? styles.currentVote : ( myInitialVote === choice ? styles.initialVote : {} )  }
+                                    textStyle={ myCurrentVote === choice ? { color: "#fff" } : ( myInitialVote === choice ? { color: "#000" } : {} ) }
+                                >
+                                    {"" + choice}
+                                </Chip>
                             </View>;
                         }
                     )
@@ -43,11 +49,18 @@ const styles = StyleSheet.create({
     voteList: {
         flexDirection: "row",
         justifyContent: "space-evenly",
-        backgroundColor: "#fff",
+        backgroundColor: "#ffffff",
+        flexWrap: "wrap",
         padding: 2,
         borderRadius: 3,
-        width: 400,
+        width: 300,
         marginTop: 4,
+    },
+    initialVote: {
+        backgroundColor: colors.lightGray,
+    },
+    currentVote: {
+        backgroundColor: colors.pink,
     },
 })
 

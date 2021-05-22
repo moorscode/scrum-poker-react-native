@@ -2,7 +2,8 @@ import React, {useEffect, useState} from "react";
 import {StyleSheet, Text, View} from "react-native";
 import {connect} from "react-redux";
 import {RootState, Vote, VoteValue} from "../store";
-import defaultStyles from "../utils/defaultStyles";
+import defaultStyles, {colors} from "../utils/defaultStyles";
+import {Chip, ProgressBar} from "react-native-paper";
 
 type Props = {
     votes: Vote[];
@@ -91,16 +92,45 @@ const Results = ({votes, voteAverage, nearestPointAverage, voters, voteCount, po
     }, [average, votes]);
 
     const getVoteDisplay = (vote: Vote) => {
-        let initial;
+        let initial, current, icon;
         if (vote.currentValue !== vote.initialValue) {
-            initial = <Text>({"" + vote.initialValue})</Text>;
+            initial = <>
+                <Text>&larr;</Text>
+                <Chip mode="outlined">{"" + vote.initialValue}</Chip>
+            </>;
         }
 
-        return <View style={styles.voter}>
-            <Text style={styles.vote}>{vote.currentValue}</Text>
-            <Text style={styles.smallMargin}>{vote.voterName}</Text>
-            {initial}
-        </View>;
+        current = <></>;
+
+        switch (vote.currentValue) {
+            case '#':
+                icon = "account-search";
+                break;
+            case '!':
+                icon = "account-alert";
+                break;
+            default:
+                current = <Chip>{"" + vote.currentValue}</Chip>
+                icon = "account";
+                break;
+        }
+
+        return (
+            <View style={styles.voter}>
+                <Chip
+                    icon={icon}
+                    mode="outlined"
+                    selected={voters.length === voteCount}
+                    selectedColor={ voters.length === voteCount ? "#ffffff" : "#000"}
+                    style={voters.length === voteCount ? styles.spacingRight : ""}
+                    textStyle={voters.length === voteCount ? { color: "white" } : ""}
+                >
+                    {vote.voterName}
+                </Chip>
+                {current}
+                {initial}
+            </View>
+        );
     }
 
     let contextView;
@@ -122,6 +152,7 @@ const Results = ({votes, voteAverage, nearestPointAverage, voters, voteCount, po
     return (
         <>
             {contextView}
+            <ProgressBar progress={(1 / voters.length) * voteCount} color="#a4286a"/>
             <View style={styles.voteContainer}>
                 <View style={styles.voteList}>
                     {
@@ -146,13 +177,17 @@ const styles = StyleSheet.create({
     ...defaultStyles,
     voteList: {
         flexDirection: "column",
-        justifyContent: "flex-start",
+        justifyContent: "space-between",
         alignContent: "center",
         flexWrap: "wrap",
     },
+    spacingRight: {
+        marginRight: 4,
+        backgroundColor: colors.pink,
+    },
     vote: {
         padding: 5,
-        backgroundColor: "#eee",
+        backgroundColor: colors.lightGray,
         textAlign: "center",
         minWidth: 60,
         borderRadius: 2,

@@ -13,6 +13,13 @@ const sideBySide:StyleEntry = {
     alignItems: "center",
 }
 
+export const colors = {
+    pink: "#a4286a",
+    green: "#82a159",
+    red: "#c94545",
+    lightGray: "#eeeeee",
+}
+
 const defaultStyles:StyleDefinition = {
     container: {
         flex: 1,
@@ -36,7 +43,7 @@ const defaultStyles:StyleDefinition = {
         fontWeight: "bold",
         marginBottom: 8,
         marginHorizontal: 4,
-        color: "#a4286a",
+        color: colors.pink,
         alignSelf: "flex-start",
     },
     h2: {
@@ -57,10 +64,10 @@ const defaultStyles:StyleDefinition = {
         fontSize: 16,
         width: 120,
         height: 28,
-        color: "#a4286a",
+        color: colors.pink,
         paddingVertical: 0,
         borderBottomWidth: 1,
-        borderBottomColor: "#a4286a",
+        borderBottomColor: colors.pink,
     },
     label: {
         fontSize: 16,

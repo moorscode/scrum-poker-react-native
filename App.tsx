@@ -3,10 +3,10 @@ import Main from "./components/Main";
 import {Provider} from 'react-redux';
 import store, {RootState} from './store';
 import socket from './utils/socket';
-import {SafeAreaView, StyleSheet, View} from "react-native";
+import {SafeAreaView, ScrollView, StyleSheet, View} from "react-native";
 
 function App() {
-    const [ background, setBackground ] = useState( "#eee" );
+    const [background, setBackground] = useState("#eee");
 
     useEffect(() => {
         return function exit() {
@@ -23,12 +23,12 @@ function App() {
         }
     }, []);
 
-    store.subscribe( () => {
+    store.subscribe(() => {
         const state: RootState = store.getState();
-        setBackground( state.app.backgroundColor );
+        setBackground(state.app.backgroundColor);
     });
 
-    const backgroundStyle = ( style: any ) => {
+    const backgroundStyle = (style: any) => {
         return {
             ...style,
             backgroundColor: background,
@@ -38,9 +38,11 @@ function App() {
     return (
         <Provider store={store}>
             <SafeAreaView style={backgroundStyle(styles.background)}>
-                <View style={styles.container}>
-                    <Main/>
-                </View>
+                <ScrollView style={styles.scrollView}>
+                    <View style={styles.container}>
+                        <Main/>
+                    </View>
+                </ScrollView>
             </SafeAreaView>
         </Provider>
     );
@@ -49,9 +51,12 @@ function App() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff",
         alignItems: "center",
         justifyContent: "flex-start",
+    },
+    scrollView: {
+        flex: 1,
+        backgroundColor: "#fff",
         margin: 24,
         marginTop: __DEV__ ? 50 : 24,
         marginBottom: 0,
