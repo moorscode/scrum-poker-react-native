@@ -1,4 +1,5 @@
 import {combineReducers, createStore} from 'redux';
+import {showMessage} from "react-native-flash-message";
 import user, {gotUserId, setUserName, setUserObserver} from './user';
 import votes, {
     gotGroupedVoterNames,
@@ -17,7 +18,7 @@ import votes, {
 } from './votes';
 import points, {gotPoints} from './points';
 import room, {gotRoom} from './room';
-import app, {setBackgroundColor, setReady} from './app';
+import app, {gotRefinementFinished, setBackgroundColor, setReady} from './app';
 import story, {gotStory} from './story';
 import socket from '../utils/socket';
 import members, {gotMembers, MemberList} from "./members";
@@ -119,6 +120,10 @@ socket.on("points", (data: VoteValue[]) => {
     store.dispatch(gotPoints(data));
 });
 
+socket.on("finished", () => {
+    store.dispatch(gotRefinementFinished(true));
+});
+
 export const vote = (value: VoteValue) => {
     const state = store.getState();
     if (state.user.observer) {
@@ -210,6 +215,37 @@ export const changeStoryName = (value: string) => {
 
     socket.emit("changeStoryName", {poker: state.room, name: value});
 }
+
+let storyName: string = "";
+store.subscribe(() => {
+    const state = store.getState();
+
+    if (storyName === state.story) {
+        return;
+    }
+
+    storyName = state.story;
+
+    showMessage({
+        message: "Story name has been updated."
+    });
+});
+
+let refinementFinished = false;
+store.subscribe(() => {
+    const state = store.getState();
+
+    if (refinementFinished === state.app.refinementFinished) {
+        return;
+    }
+
+    refinementFinished = state.app.refinementFinished;
+
+    showMessage({
+        message: "The refinement is finished.",
+        autoHide: false,
+    });
+});
 
 export default store;
 

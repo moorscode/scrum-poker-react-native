@@ -1,12 +1,12 @@
 import {ImageStyle, StyleSheet, TextStyle, ViewStyle} from "react-native";
 
-type StyleEntry = ViewStyle|TextStyle|ImageStyle[];
+type StyleEntry = ViewStyle | TextStyle | ImageStyle[];
 
 type StyleDefinition = {
-    [key:string]: StyleEntry;
+    [key: string]: StyleEntry;
 }
 
-const sideBySide:StyleEntry = {
+const sideBySide: StyleEntry = {
     flexDirection: "row",
     justifyContent: "space-between",
     alignContent: "space-between",
@@ -20,7 +20,7 @@ export const colors = {
     lightGray: "#eeeeee",
 }
 
-const defaultStyles:StyleDefinition = {
+const defaultStyles: StyleDefinition = {
     container: {
         flex: 1,
         backgroundColor: '#fff',

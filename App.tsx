@@ -4,6 +4,7 @@ import {Provider} from 'react-redux';
 import store, {RootState} from './store';
 import socket from './utils/socket';
 import {SafeAreaView, ScrollView, StyleSheet, View} from "react-native";
+import FlashMessage from "react-native-flash-message";
 
 function App() {
     const [background, setBackground] = useState("#eee");
@@ -43,6 +44,7 @@ function App() {
                         <Main/>
                     </View>
                 </ScrollView>
+                <FlashMessage position="top" />
             </SafeAreaView>
         </Provider>
     );
