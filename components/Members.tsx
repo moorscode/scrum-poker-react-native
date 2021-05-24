@@ -3,7 +3,7 @@ import {MemberList, RootState} from "../store";
 import {connect} from "react-redux";
 import {List} from "react-native-paper";
 import {StyleSheet, View} from "react-native";
-import defaultStyles from "../utils/defaultStyles";
+import defaultStyles, {colors} from "../utils/defaultStyles";
 
 type Props = {
     members: MemberList;
@@ -12,8 +12,8 @@ type Props = {
 const Members = ({members}: Props) => {
     return (
         <View style={styles.sideBySideFullWidth}>
-            <List.Accordion title="Participants" style={styles.list}>
-                <List.Subheader>Voters</List.Subheader>
+            <List.Accordion title="Participants" style={styles.list} titleStyle={styles.title}>
+                <List.Subheader style={styles.subheader}>Voters</List.Subheader>
                 {members.voters.map(
                     (voter: string, index: number) =>
                         <List.Item
@@ -23,7 +23,7 @@ const Members = ({members}: Props) => {
                             left={() => <List.Icon style={ { marginRight: 0, marginVertical: 0, marginLeft: 0 } } icon="account"/>}
                         />
                 )}
-                <List.Subheader>Observers</List.Subheader>
+                <List.Subheader style={styles.subheader}>Observers</List.Subheader>
                 {members.observers.map(
                     (observer: string, index: number) =>
                         <List.Item
@@ -33,7 +33,7 @@ const Members = ({members}: Props) => {
                             left={() => <List.Icon style={ { marginRight: 0, marginVertical: 0, marginLeft: 0 } } icon="account"/>}
                         />
                 )}
-                <List.Subheader>Disconnected</List.Subheader>
+                <List.Subheader style={styles.subheader}>Disconnected</List.Subheader>
                 {members.disconnected.map(
                     (disconnected: string, index: number) =>
                         <List.Item
@@ -56,6 +56,17 @@ const styles = StyleSheet.create({
     listItem: {
         margin: 0,
         paddingVertical: 0,
+    },
+    title: {
+        color: colors.pink,
+    },
+    subheader: {
+        color: colors.green,
+        borderBottomWidth: 1,
+        paddingBottom: 6,
+        paddingHorizontal: 0,
+        borderBottomColor: colors.lightGray,
+        marginHorizontal: 16,
     },
 });
 
