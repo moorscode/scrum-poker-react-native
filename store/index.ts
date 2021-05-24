@@ -241,10 +241,11 @@ store.subscribe(() => {
 
     refinementFinished = state.app.refinementFinished;
 
-    showMessage({
-        message: "The refinement is finished.",
-        autoHide: false,
-    });
+    if ( refinementFinished ) {
+        showMessage({
+            message: "The refinement is finished.",
+        });
+    }
 });
 
 export default store;
