@@ -1,26 +1,38 @@
 import React, {useEffect, useState} from "react";
 import {StyleSheet, Text, View} from "react-native";
 import {connect} from "react-redux";
-import {RootState, Vote, VoteValue} from "../store";
+import {RootState, toggleRevealVotes, Vote, VoteValue} from "../store";
 import defaultStyles, {colors} from "../utils/defaultStyles";
-import {Chip, ProgressBar} from "react-native-paper";
+import {Chip, ProgressBar, Switch} from "react-native-paper";
 
 type Props = {
     votes: Vote[];
     voteCount: number;
     voteAverage: VoteValue;
+    votesRevealed: boolean;
     nearestPointAverage: VoteValue;
     voters: string[];
+    myVote: VoteValue,
     points: VoteValue[];
 }
 
-const Results = ({votes, voteAverage, nearestPointAverage, voters, voteCount, points}: Props) => {
+const Results = (
+    {
+        votes,
+        voteAverage,
+        votesRevealed,
+        nearestPointAverage,
+        voters,
+        voteCount,
+        myVote,
+        points
+    }: Props) => {
     const [average, setAverage] = useState("");
     const [averageContext, setAverageContext] = useState("");
     const [standardDeviation, setStandardDeviation] = useState("");
 
     useEffect(() => {
-        if (voteCount === 0 || voteCount < voters.length) {
+        if (!votesRevealed && (voteCount === 0 || voteCount < voters.length)) {
             setAverage("");
             return;
         }
@@ -37,7 +49,7 @@ const Results = ({votes, voteAverage, nearestPointAverage, voters, voteCount, po
         if (typeof voteAverage === "number") {
             setAverage("" + Math.round(voteAverage * 100) / 100);
         }
-    }, [voteAverage, voteCount]);
+    }, [voteAverage, voteCount, voters.length, votesRevealed]);
 
     useEffect(() => {
         if (average === "") {
@@ -83,12 +95,16 @@ const Results = ({votes, voteAverage, nearestPointAverage, voters, voteCount, po
             return;
         }
 
+        const numberVotes: number[] = flattenedVotes
+            .map( ( vote ): number|null => typeof vote === "number" ? parseFloat( ""+vote ) : null )
+            .filter( (vote) => vote !== null );
+
         let powers = 0;
-        for (let i = 0; i < votes.length; i++) {
-            powers += Math.pow(parseFloat(votes.map((vote: Vote) => "" + vote.currentValue)[i]) - parseInt(average, 10), 2);
+        for (let i = 0; i < numberVotes.length; i++) {
+            powers += Math.pow(numberVotes[i] - parseFloat(average), 2);
         }
 
-        setStandardDeviation("" + Math.round(Math.sqrt(powers / votes.length) * 100) / 100);
+        setStandardDeviation("" + Math.round(Math.sqrt(powers / numberVotes.length) * 100) / 100);
     }, [average, votes]);
 
     const getVoteDisplay = (vote: Vote) => {
@@ -121,9 +137,9 @@ const Results = ({votes, voteAverage, nearestPointAverage, voters, voteCount, po
                     icon={icon}
                     mode="outlined"
                     selected={voters.length === voteCount}
-                    selectedColor={ voters.length === voteCount ? "#ffffff" : "#000"}
+                    selectedColor={voters.length === voteCount ? "#ffffff" : "#000"}
                     style={voters.length === voteCount ? styles.spacingRight : ""}
-                    textStyle={voters.length === voteCount ? { color: "white" } : ""}
+                    textStyle={voters.length === voteCount ? {color: "white"} : ""}
                 >
                     {vote.voterName}
                 </Chip>
@@ -141,8 +157,8 @@ const Results = ({votes, voteAverage, nearestPointAverage, voters, voteCount, po
     }
 
     let stats;
-    if (average !== "") {
-        stats = <View>
+    if (average !== "" && (votesRevealed || voteCount === voters.length)) {
+        stats = <View style={styles.statsContainer}>
             <Text style={styles.stats}>Average: {average}</Text>
             <Text style={styles.stats}>Standard deviation: {standardDeviation}</Text>
             <Text style={styles.alignRightBold}>Average story point: {average ? nearestPointAverage : average}</Text>
@@ -153,6 +169,15 @@ const Results = ({votes, voteAverage, nearestPointAverage, voters, voteCount, po
         <>
             {contextView}
             <ProgressBar progress={(1 / voters.length) * voteCount} color="#a4286a"/>
+            <View style={styles.revealVotes}>
+                <Text>Votes revealed</Text>
+                <Switch
+                    value={votesRevealed}
+                    onValueChange={toggleRevealVotes}
+                    disabled={voteCount === 0 || myVote === "" || voteCount === voters.length}
+                    color={colors.pink}
+                />
+            </View>
             <View style={styles.voteContainer}>
                 <View style={styles.voteList}>
                     {
@@ -184,6 +209,9 @@ const styles = StyleSheet.create({
     spacingRight: {
         marginRight: 4,
         backgroundColor: colors.pink,
+    },
+    statsContainer: {
+        paddingRight: 4,
     },
     vote: {
         padding: 5,
@@ -220,6 +248,19 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-between",
     },
+    revealVotes: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        width: 340,
+        marginBottom: 16,
+        paddingVertical: 8,
+        paddingLeft: 4,
+        borderBottomColor: colors.lightGray,
+        borderBottomWidth: 1,
+        borderTopColor: colors.lightGray,
+        borderTopWidth: 1,
+    },
 })
 
 export default connect((state: RootState) => {
@@ -227,7 +268,9 @@ export default connect((state: RootState) => {
         votes: state.votes.votes,
         voteCount: state.votes.voteCount,
         voteAverage: state.votes.voteAverage,
+        votesRevealed: state.votes.votesRevealed,
         nearestPointAverage: state.votes.nearestPointAverage,
+        myVote: state.votes.myCurrentVote,
         voters: state.members.voters,
         points: state.points,
     };

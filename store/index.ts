@@ -135,6 +135,10 @@ export const vote = (value: VoteValue) => {
 
 export const toggleRevealVotes = () => {
     const state = store.getState();
+    if (!state.room) {
+        return;
+    }
+
     socket.emit("toggleRevealVotes", {poker: state.room});
 }
 
@@ -213,6 +217,10 @@ export const changeStoryName = (value: string) => {
         return;
     }
 
+    if (!state.room) {
+        return;
+    }
+
     socket.emit("changeStoryName", {poker: state.room, name: value});
 }
 
@@ -241,7 +249,7 @@ store.subscribe(() => {
 
     refinementFinished = state.app.refinementFinished;
 
-    if ( refinementFinished ) {
+    if (refinementFinished) {
         showMessage({
             message: "The refinement is finished.",
         });
