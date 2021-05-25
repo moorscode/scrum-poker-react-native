@@ -43,7 +43,6 @@ const Choices = ({choices, myCurrentVote, myInitialVote, onChoice}: Props) => {
     );
 }
 
-// @ts-ignore
 const styles = StyleSheet.create({
     ...defaultStyles,
     voteList: {

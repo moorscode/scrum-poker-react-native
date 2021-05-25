@@ -1,10 +1,13 @@
 import {ImageStyle, StyleSheet, TextStyle, ViewStyle} from "react-native";
 
-type StyleEntry = ViewStyle | TextStyle | ImageStyle[];
-
-type StyleDefinition = {
-    [key: string]: StyleEntry;
+export const colors = {
+    pink: "#a4286a",
+    green: "#82a159",
+    red: "#c94545",
+    lightGray: "#eeeeee",
 }
+
+type StyleEntry = ViewStyle | TextStyle | ImageStyle[];
 
 const sideBySide: StyleEntry = {
     flexDirection: "row",
@@ -13,14 +16,7 @@ const sideBySide: StyleEntry = {
     alignItems: "center",
 }
 
-export const colors = {
-    pink: "#a4286a",
-    green: "#82a159",
-    red: "#c94545",
-    lightGray: "#eeeeee",
-}
-
-const defaultStyles: StyleDefinition = {
+const defaultStyles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
@@ -73,6 +69,6 @@ const defaultStyles: StyleDefinition = {
         fontSize: 16,
         minWidth: 50,
     },
-};
+});
 
 export default defaultStyles;

@@ -63,8 +63,7 @@ const Main = (props: Props) => {
     );
 }
 
-// @ts-ignore
-const styles = StyleSheet.create(defaultStyles);
+const styles = defaultStyles;
 
 export default connect((state: RootState) => {
     return {
