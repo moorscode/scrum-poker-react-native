@@ -5,9 +5,10 @@ import store, {RootState} from './store';
 import socket from './utils/socket';
 import {SafeAreaView, ScrollView, StyleSheet, View} from "react-native";
 import FlashMessage from "react-native-flash-message";
+import {colors} from "./utils/defaultStyles";
 
 function App() {
-    const [background, setBackground] = useState("#eee");
+    const [background, setBackground] = useState(colors.lightGray);
 
     useEffect(() => {
         return function exit() {
@@ -69,7 +70,7 @@ const styles = StyleSheet.create({
     },
     background: {
         flex: 1,
-        backgroundColor: "#eee",
+        backgroundColor: colors.lightGray,
     }
 });
 
