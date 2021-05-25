@@ -52,12 +52,27 @@ export const gotVoteCount = (count: number) => ({type: GOT_VOTE_COUNT, count});
 export const gotVoteAverage = (average: VoteValue) => ({type: GOT_VOTE_AVERAGE, average});
 export const gotVotesRevealed = (revealed: boolean) => ({type: GOT_VOTES_REVEALED, revealed});
 export const gotVotedNames = (names: string[]) => ({type: GOT_VOTED_NAMES, names});
-export const gotGroupedVoterNames = (groupedVoterNames: GroupedVoterNames) => ({type: GOT_VOTES_NAMES_GROUPED, groupedVoterNames});
+export const gotGroupedVoterNames = (groupedVoterNames: GroupedVoterNames) => ({
+    type: GOT_VOTES_NAMES_GROUPED,
+    groupedVoterNames
+});
 export const gotNearestPointAverage = (value: VoteValue) => ({type: GOT_NEAREST_POINT_AVERAGE, value});
 export const gotMyInitialVote = (myInitialVote: VoteValue) => ({type: GOT_MY_INITIAL_VOTE, myInitialVote});
 export const gotMyCurrentVote = (myCurrentVote: VoteValue) => ({type: GOT_MY_CURRENT_VOTE, myCurrentVote});
 
-const reducer = (state: VoteStore = {votes: [], myInitialVote: "", myCurrentVote: "", voteAverage: "", voteCount: 0, votesRevealed: false, votedNames: [], groupedVoterNames: {}, nearestPointAverage: "" }, action: any) => {
+const defaultState: VoteStore = {
+    votes: [],
+    myInitialVote: '',
+    myCurrentVote: '',
+    voteAverage: '',
+    voteCount: 0,
+    votesRevealed: false,
+    votedNames: [],
+    groupedVoterNames: {},
+    nearestPointAverage: ''
+};
+
+const reducer = (state: VoteStore = defaultState, action: any) => {
     switch (action.type) {
         case GOT_VOTES:
             return {

@@ -8,7 +8,9 @@ export type MemberList = {
     voters: string[];
 }
 
-const reducer = (state: MemberList = {disconnected: [], observers: [], voters: []}, action: any) => {
+const defaultState: MemberList = {disconnected: [], observers: [], voters: []};
+
+const reducer = (state: MemberList = defaultState, action: any) => {
     switch (action.type) {
         case GOT_MEMBERS:
             return action.memberList;

@@ -12,7 +12,9 @@ export type User = {
     observer: boolean;
 }
 
-const reducer = (state: User = {userId: null, name: "", observer: false}, action: any) => {
+const defaultState: User = {userId: null, name: "", observer: false};
+
+const reducer = (state: User = defaultState, action: any) => {
     switch (action.type) {
         case GOT_USER_ID:
             return {
@@ -24,7 +26,7 @@ const reducer = (state: User = {userId: null, name: "", observer: false}, action
                 ...state,
                 name: action.name,
             };
-        case SET_USER_OBSERVER:{}
+        case SET_USER_OBSERVER:
             return {
                 ...state,
                 observer: action.observer,
