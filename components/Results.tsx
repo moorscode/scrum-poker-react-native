@@ -96,8 +96,8 @@ const Results = (
         }
 
         const numberVotes: number[] = flattenedVotes
-            .map( ( vote ): number|null => typeof vote === "number" ? parseFloat( ""+vote ) : null )
-            .filter( (vote) => vote !== null );
+            .filter((vote: VoteValue) => typeof vote === "number")
+            .map((vote: VoteValue): number => parseFloat("" + vote));
 
         let powers = 0;
         for (let i = 0; i < numberVotes.length; i++) {
@@ -138,7 +138,7 @@ const Results = (
                     mode="outlined"
                     selected={voters.length === voteCount}
                     selectedColor={voters.length === voteCount ? "#ffffff" : "#000"}
-                    style={voters.length === voteCount ? styles.spacingRight : ""}
+                    style={voters.length === voteCount ? styles.spacingRight : null}
                     textStyle={voters.length === voteCount ? {color: "white"} : ""}
                 >
                     {vote.voterName}
