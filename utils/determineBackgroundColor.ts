@@ -3,7 +3,7 @@ import {colors} from "./defaultStyles";
 
 export default (voteCount: number, voterCount: number, voteAverage: VoteValue, votes: Vote[], points: VoteValue[]): string => {
     if (voteCount === 0 || voteCount < voterCount || typeof voteAverage === "string") {
-        return "#eee";
+        return colors.lightGray;
     }
 
     // Find the difference between the lowest and the highest votes.
