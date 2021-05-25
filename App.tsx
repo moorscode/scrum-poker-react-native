@@ -3,7 +3,7 @@ import Main from "./components/Main";
 import {Provider} from 'react-redux';
 import store, {RootState} from './store';
 import socket from './utils/socket';
-import {SafeAreaView, ScrollView, StyleSheet, View} from "react-native";
+import {SafeAreaView, ScrollView, StyleSheet, View, ViewStyle} from "react-native";
 import FlashMessage from "react-native-flash-message";
 import {colors} from "./utils/defaultStyles";
 
@@ -25,17 +25,17 @@ function App() {
         }
     }, []);
 
-    store.subscribe(() => {
-        const state: RootState = store.getState();
-        setBackground(state.app.backgroundColor);
-    });
-
-    const backgroundStyle = (style: any) => {
+    const backgroundStyle = (style: ViewStyle) => {
         return {
             ...style,
             backgroundColor: background,
         }
     };
+
+    store.subscribe(() => {
+        const state: RootState = store.getState();
+        setBackground(state.app.backgroundColor);
+    });
 
     return (
         <Provider store={store}>
